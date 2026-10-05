@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Widgets Guide — Example Docs</title>
+  <meta name="description" content="How to build   widgets.">
+  <base href="https://docs.example.com/v2/">
+  <script>var secret = "should never be indexed";</script>
+  <style>.x { color: red }</style>
+</head>
+<body>
+  <header class="site-header"><a href="/">Example Docs</a> <form><input name="q"></form></header>
+  <nav class="sidebar">
+    <a href="guide/widgets.html">Widgets</a>
+    <a href="guide/gadgets.html#top">Gadgets</a>
+    <a href="https://other.example.org/">Elsewhere</a>
+    <a href="mailto:docs@example.com">Mail</a>
+    <a href="javascript:void(0)">JS</a>
+  </nav>
+  <div class="layout">
+    <aside>Table of contents junk</aside>
+    <main>
+      <article>
+        <h1 id="widgets">Widgets Guide<a class="headerlink" href="#widgets">¶</a></h1>
+        <p>Widgets are <strong>small</strong>,   <em>reusable</em> components. Call <code>widget.New()</code>
+           to create one, or read the <a href="guide/gadgets.html#make">gadget docs</a>.</p>
+        <div class="admonition note"><p>Note: widgets are thread-safe.</p></div>
+        <section id="install-section">
+          <h2>Installing</h2>
+          <div class="highlight-shell"><pre><span class="linenos">1</span>$ pip install widgets
+<span class="linenos">2</span>$ widgets --version</pre></div>
+          <ul>
+            <li>First item with <code>code</code></li>
+            <li><p>Second item</p><pre class="language-go"><code>fmt.Println("hi")</code></pre>
+              <ul><li>Nested item</li></ul>
+            </li>
+          </ul>
+        </section>
+        <h2>Options</h2>
+        <table>
+          <thead><tr><th>Name</th><th>Default</th></tr></thead>
+          <tbody><tr><td>size</td><td>10</td></tr><tr><td>color</td><td>blue</td></tr></tbody>
+        </table>
+        <dl><dt>timeout</dt><dd><p>How long to wait.</p></dd></dl>
+        <h2>Options</h2>
+        <p hidden>Hidden text</p>
+        <p style="display: none">Also hidden</p>
+        <blockquote><p>Quoted wisdom.</p></blockquote>
+        <button>Copy</button>
+        <noscript>Enable JS</noscript>
+      </article>
+    </main>
+  </div>
+  <footer class="site-footer">Copyright footer text</footer>
+</body>
+</html>
