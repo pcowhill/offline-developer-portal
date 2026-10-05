@@ -4,20 +4,20 @@ sources.yaml.txt
 *.local.yaml
 
 # Generated corpus and crawl output (local data).
-corpus/
-corpus.tmp/
-corpus.previous/
+/corpus/
+/corpus.tmp/
+/corpus.previous/
 
 # Compiled binaries - built by CI / release workflows, never committed.
 /bin/
 /offline-docs
 *.exe
-release/
+/release/
 
 # Tooling and caches.
 node_modules/
-coverage/
-test-results/
+/coverage/
+/test-results/
 .vite/
 *.log
 *.tsbuildinfo
