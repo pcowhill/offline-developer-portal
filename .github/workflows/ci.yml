@@ -17,63 +17,56 @@ env:
   GO_VERSION: '1.25.1'
   NODE_VERSION: '22'
 
+# Everything runs in one job on purpose: it needs a single runner, so no job
+# can be left waiting in the queue behind another one.
 jobs:
-  frontend:
-    name: Frontend (lint, typecheck, test, build, dist check)
+  ci:
+    name: Build, test and package
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm test
-      - name: Rebuild and verify committed dist/ is current
-        run: scripts/verify-dist.sh
-
-  go:
-    name: Go (fmt, vet, test, build)
-    runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
           cache: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      # ---- Frontend ----
+      - run: npm ci
+      - name: Frontend lint
+        run: npm run lint
+      - name: Frontend typecheck
+        run: npm run typecheck
+      - name: Frontend tests
+        run: npm test
+      - name: Rebuild and verify committed dist/ is current
+        run: scripts/verify-dist.sh
+
+      # ---- Go ----
       - name: gofmt
         run: |
           unformatted=$(gofmt -l cmd internal)
           if [ -n "$unformatted" ]; then echo "Run gofmt on:"; echo "$unformatted"; exit 1; fi
       - name: Vendored modules are consistent
         run: go mod verify && go mod vendor && git diff --exit-code -- vendor go.mod go.sum
-      - run: go vet ./cmd/... ./internal/...
-      - run: go test -race ./cmd/... ./internal/...
-      - name: Cross-compile
+      - name: go vet
+        run: go vet ./cmd/... ./internal/...
+      - name: Go tests
+        run: go test -race ./cmd/... ./internal/...
+      - name: Cross-compile Windows and Linux amd64
         run: |
           GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -o /tmp/offline-docs.exe ./cmd/offline-docs
           GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /tmp/offline-docs ./cmd/offline-docs
 
-  e2e:
-    name: End-to-end (index fixture site, go offline, browse)
-    runs-on: ubuntu-latest
-    needs: [frontend, go]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version: ${{ env.GO_VERSION }}
-          cache: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-      - run: npm ci
+      # ---- End-to-end: index a fixture site, take it offline, browse ----
       - run: npx playwright install --with-deps chromium
       - run: scripts/build-go.sh
-      - run: npm run e2e
+      - name: End-to-end test
+        run: npm run e2e
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -81,17 +74,8 @@ jobs:
           path: test-results/e2e/
           if-no-files-found: ignore
 
-  package:
-    name: Release packages (preview)
-    runs-on: ubuntu-latest
-    needs: [frontend, go]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version: ${{ env.GO_VERSION }}
-          cache: false
-      - name: Build and verify packages
+      # ---- Release packages (preview) ----
+      - name: Build and verify release packages
         run: scripts/package-release.sh "ci-${GITHUB_SHA::7}"
       - uses: actions/upload-artifact@v4
         with:

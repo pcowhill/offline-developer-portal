@@ -361,7 +361,7 @@ TypeScript tests read the same golden files.
 
 ## Release process
 
-1. Make sure `main` is green in CI (`CI` workflow: lint, typecheck, tests,
+1. Make sure `main` is green in CI (`CI` workflow, a single job: lint, typecheck, tests,
    stale-`dist/` check, Go tests, cross-builds, end-to-end test, package
    preview). Every CI run also uploads preview packages as a workflow artifact.
 2. Update `version` in `package.json` if desired, then tag and push:
