@@ -245,7 +245,7 @@ func (e *extractor) skip(n *html.Node) bool {
 		return true
 	}
 	for _, t := range classAndID(n) {
-		if skippedClassTokens[t] {
+		if skippedClassTokens[t] || strings.Contains(t, "breadcrumb") {
 			return true
 		}
 	}

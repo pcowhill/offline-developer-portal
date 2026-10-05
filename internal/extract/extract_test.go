@@ -63,7 +63,7 @@ func TestHeadingsAndAnchors(t *testing.T) {
 
 func TestChromeAndHiddenContentRemoved(t *testing.T) {
 	text := allText(load(t).Blocks)
-	for _, bad := range []string{"should never be indexed", "color: red", "Table of contents junk", "Copyright footer", "Hidden text", "Also hidden", "Enable JS", "Elsewhere", "¶", `"Copy"`} {
+	for _, bad := range []string{"should never be indexed", "color: red", "Table of contents junk", "Copyright footer", "Hidden text", "Also hidden", "Enable JS", "Elsewhere", "¶", `"Copy"`, "BreadcrumbTrailText"} {
 		if strings.Contains(text, bad) {
 			t.Errorf("extracted content contains %q", bad)
 		}
