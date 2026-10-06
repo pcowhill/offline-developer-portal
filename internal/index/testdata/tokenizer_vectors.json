@@ -1,0 +1,23 @@
+{
+  "description": "Shared tokenizer test vectors. Used by internal/index/tokenize_test.go and src/search/tokenize.test.ts so that the Go indexer and the browser search tokenize identically.",
+  "cases": [
+    { "input": "Hello, World!", "tokens": ["hello", "world"] },
+    { "input": "net/http.Client.Do()", "tokens": ["net", "http", "client", "do"] },
+    { "input": "snake_case and kebab-case", "tokens": ["snake", "case", "and", "kebab", "case"] },
+    { "input": "Python 3.12 release", "tokens": ["python", "3", "12", "release"] },
+    { "input": "  multiple   spaces\tand\nnewlines ", "tokens": ["multiple", "spaces", "and", "newlines"] },
+    { "input": "Ünïcödé Straße ÉLAN", "tokens": ["ünïcödé", "straße", "élan"] },
+    { "input": "日本語 テキスト", "tokens": ["日本語", "テキスト"] },
+    { "input": "x = a+b*c", "tokens": ["x", "a", "b", "c"] },
+    { "input": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb ok", "tokens": ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "ok"] },
+    { "input": "", "tokens": [] },
+    { "input": "--- *** ...", "tokens": [] },
+    { "input": "The for-loop IS in the tutorial", "tokens": ["the", "for", "loop", "is", "in", "the", "tutorial"] }
+  ],
+  "query_cases": [
+    { "query": "the for loop", "terms": ["for", "loop"] },
+    { "query": "the", "terms": ["the"] },
+    { "query": "Install install INSTALL", "terms": ["install"] },
+    { "query": "if statement", "terms": ["if", "statement"] }
+  ]
+}

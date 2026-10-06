@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GO_VERSION: '1.25.1'
+  NODE_VERSION: '22'
+
+# Everything runs in one job on purpose: it needs a single runner, so no job
+# can be left waiting in the queue behind another one.
+jobs:
+  ci:
+    name: Build, test and package
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      # ---- Frontend ----
+      - run: npm ci
+      - name: Frontend lint
+        run: npm run lint
+      - name: Frontend typecheck
+        run: npm run typecheck
+      - name: Frontend tests
+        run: npm test
+      - name: Rebuild and verify committed dist/ is current
+        run: scripts/verify-dist.sh
+
+      # ---- Go ----
+      - name: gofmt
+        run: |
+          unformatted=$(gofmt -l cmd internal)
+          if [ -n "$unformatted" ]; then echo "Run gofmt on:"; echo "$unformatted"; exit 1; fi
+      - name: Vendored modules are consistent
+        run: go mod verify && go mod vendor && git diff --exit-code -- vendor go.mod go.sum
+      - name: go vet
+        run: go vet ./cmd/... ./internal/...
+      - name: Go tests
+        run: go test -race ./cmd/... ./internal/...
+      - name: Cross-compile Windows and Linux amd64
+        run: |
+          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -o /tmp/offline-docs.exe ./cmd/offline-docs
+          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /tmp/offline-docs ./cmd/offline-docs
+
+      # ---- End-to-end: index a fixture site, take it offline, browse ----
+      - run: npx playwright install --with-deps chromium
+      - run: scripts/build-go.sh
+      - name: End-to-end test
+        run: npm run e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-screenshots
+          path: test-results/e2e/
+          if-no-files-found: ignore
+
+      # ---- Release packages (preview) ----
+      - name: Build and verify release packages
+        run: scripts/package-release.sh "ci-${GITHUB_SHA::7}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-packages-preview
+          path: |
+            release/*.zip
+            release/*.tar.gz
+            release/SHA256SUMS.txt

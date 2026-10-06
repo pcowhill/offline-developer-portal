@@ -1,0 +1,45 @@
+OFFLINE DEVELOPER PORTAL - QUICK START (WINDOWS)
+================================================
+
+Nothing needs to be installed. You do not need Administrator rights.
+
+1. EXTRACT
+   Right-click the downloaded .zip file > Extract All... and extract it to a
+   folder you own, for example Documents\offline-developer-portal.
+   (Tip: if Windows shows "Windows protected your PC" later, click
+   "More info" > "Run anyway". The program is not code-signed.)
+
+2. CONFIGURE
+   Double-click index-windows.cmd. If sources.yaml does not exist yet, it
+   offers to create it from sources.example.yaml and opens it in Notepad.
+   Edit the list of documentation sites, then save.
+   Make sure the file is named exactly "sources.yaml" (not sources.yaml.txt).
+
+   Each source needs an id, start_urls and its crawl boundaries
+   (allowed_prefixes and/or allowed_hosts). The crawler NEVER leaves these
+   boundaries. Keep max_pages small to start with.
+
+3. INDEX (needs access to the documentation sites)
+   Double-click index-windows.cmd again. It crawls the configured sites,
+   shows its progress, and writes the searchable corpus into the "corpus"
+   folder. The window stays open when it is done.
+
+4. BROWSE (no network needed)
+   Double-click serve-windows.cmd. Your browser opens
+       http://localhost:8080
+   (if it does not, open that address yourself). Keep the black window open
+   while using the portal; close it to stop the portal.
+
+UPDATING
+   Run index-windows.cmd again whenever you want fresh content. The old
+   corpus is replaced only when the new crawl succeeds.
+
+FILES
+   offline-docs.exe       the indexer and local web server
+   dist\                  the portal web site (static files)
+   sources.example.yaml   example configuration (safe public sites)
+   sources.yaml           YOUR configuration (created by you, stays local)
+   corpus\                the generated offline index (created by indexing)
+
+Your sources.yaml and corpus never leave this computer.
+More documentation: https://github.com/pcowhill/offline-developer-portal

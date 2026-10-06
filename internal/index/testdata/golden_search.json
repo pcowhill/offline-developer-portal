@@ -1,0 +1,73 @@
+{
+  "co": [
+    {
+      "id": "bea2854f3bec7451",
+      "score": 0.904884
+    },
+    {
+      "id": "6aa8a449d8f79c50",
+      "score": 0.528231
+    }
+  ],
+  "config": [
+    {
+      "id": "bea2854f3bec7451",
+      "score": 0.904884
+    }
+  ],
+  "for": [
+    {
+      "id": "6aa8a449d8f79c50",
+      "score": 1.056462
+    }
+  ],
+  "frob": [],
+  "gadget": [],
+  "in": [
+    {
+      "id": "1a951a2d3cbea644",
+      "score": 0.897691
+    }
+  ],
+  "install": [
+    {
+      "id": "1a951a2d3cbea644",
+      "score": 0.975839
+    }
+  ],
+  "installation guide": [
+    {
+      "id": "1a951a2d3cbea644",
+      "score": 7.181527
+    }
+  ],
+  "loop": [
+    {
+      "id": "6aa8a449d8f79c50",
+      "score": 1.601354
+    }
+  ],
+  "re": [
+    {
+      "id": "bea2854f3bec7451",
+      "score": 0.881194
+    },
+    {
+      "id": "6aa8a449d8f79c50",
+      "score": 0.709227
+    }
+  ],
+  "the": [],
+  "timeout retries": [
+    {
+      "id": "bea2854f3bec7451",
+      "score": 2.209388
+    }
+  ],
+  "while loop": [
+    {
+      "id": "6aa8a449d8f79c50",
+      "score": 3.019809
+    }
+  ]
+}

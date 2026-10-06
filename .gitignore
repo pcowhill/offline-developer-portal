@@ -1,0 +1,25 @@
+# Local, private configuration - never commit (may contain private URLs).
+sources.yaml
+sources.yaml.txt
+*.local.yaml
+
+# Generated corpus and crawl output (local data).
+/corpus/
+/corpus.tmp/
+/corpus.previous/
+
+# Compiled binaries - built by CI / release workflows, never committed.
+/bin/
+/offline-docs
+*.exe
+/release/
+
+# Tooling and caches.
+node_modules/
+/coverage/
+/test-results/
+.vite/
+*.log
+*.tsbuildinfo
+.DS_Store
+Thumbs.db

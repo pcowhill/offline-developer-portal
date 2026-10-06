@@ -1,0 +1,11 @@
+* text=auto eol=lf
+
+# Windows batch files must use CRLF line endings.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# The committed production build is compared byte-for-byte in CI.
+dist/** -text
+
+*.png binary
+*.ico binary

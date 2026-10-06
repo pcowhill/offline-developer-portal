@@ -1,0 +1,73 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to (re)build a release for, e.g. v0.1.0'
+        required: true
+
+permissions:
+  contents: write
+
+env:
+  GO_VERSION: '1.25.1'
+  NODE_VERSION: '22'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve tag
+        id: tag
+        run: echo "tag=${INPUT_TAG:-$GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+        env:
+          INPUT_TAG: ${{ github.event.inputs.tag }}
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.tag.outputs.tag }}
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - name: Verify committed dist/ is current
+        run: scripts/verify-dist.sh
+      - run: go test ./cmd/... ./internal/...
+      - name: Build release packages
+        run: scripts/package-release.sh "${{ steps.tag.outputs.tag }}"
+      - name: Write release notes
+        run: |
+          TAG="${{ steps.tag.outputs.tag }}"
+          cat > release/NOTES.md <<NOTES
+          Ready-to-run packages of the Offline Developer Portal. No Node, Go or other tools are needed to use them.
+
+          | Platform | Download |
+          | --- | --- |
+          | Windows (64-bit) | \`offline-developer-portal-$TAG-windows-amd64.zip\` |
+          | Linux (x86-64) | \`offline-developer-portal-$TAG-linux-amd64.tar.gz\` |
+
+          **Windows:** extract the zip, double-click \`index-windows.cmd\` (it offers to create \`sources.yaml\` from the example), then \`serve-windows.cmd\`.
+
+          **Linux:** \`tar xzf offline-developer-portal-$TAG-linux-amd64.tar.gz && cd offline-developer-portal-$TAG-linux-amd64 && cp sources.example.yaml sources.yaml && ./index-linux.sh && ./serve-linux.sh\`
+
+          Verify downloads with \`SHA256SUMS.txt\`. See QUICKSTART in each package and the README for details.
+          NOTES
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" release/*.zip release/*.tar.gz release/SHA256SUMS.txt --clobber
+          else
+            gh release create "$TAG" release/*.zip release/*.tar.gz release/SHA256SUMS.txt \
+              --title "Offline Developer Portal $TAG" --notes-file release/NOTES.md --verify-tag
+          fi

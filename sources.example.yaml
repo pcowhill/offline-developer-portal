@@ -1,0 +1,92 @@
+# Offline Developer Portal - example source configuration
+# ======================================================================
+#
+# HOW TO USE
+#   1. Copy this file to "sources.yaml" in the same folder.
+#      (On Windows, make sure the copy is not named "sources.yaml.txt".)
+#   2. Edit sources.yaml: keep, change or remove the example sources below.
+#   3. Run index-windows.cmd (Windows) or ./index-linux.sh (Linux).
+#   4. Run serve-windows.cmd (Windows) or ./serve-linux.sh (Linux).
+#
+# sources.yaml is LOCAL runtime configuration. It is ignored by Git, it is
+# never needed to build the portal, and the URLs in it never leave the
+# computer you index on. Put private/intranet URLs only in sources.yaml,
+# never in this example file.
+#
+# CRAWLING SAFETY - PLEASE READ
+#   * Only crawl sites you are allowed to crawl.
+#   * The crawler NEVER leaves the boundaries you define below: a page is
+#     fetched only if it is under one of "allowed_prefixes" or on one of
+#     "allowed_hosts", matches "include_patterns" (if any) and matches
+#     no "exclude_patterns". Redirects are checked the same way.
+#   * Keep "allowed_prefixes" as narrow as possible (e.g. the /docs/ folder,
+#     not the whole site). "allowed_hosts" allows an ENTIRE host - use it
+#     only for small, dedicated documentation hosts.
+#   * "max_pages" caps how many pages are requested per source
+#     (default 100, hard limit 20000). Start small and raise it if needed.
+#   * robots.txt is respected by default.
+#   * Only GET requests are made. No JavaScript, no logins, no forms.
+#
+# REFERENCE
+#   settings:                    (optional, global)
+#     concurrency: 4             parallel requests per source (1-16)
+#     request_delay_ms: 250      minimum gap between requests to one host
+#     request_timeout_seconds: 20
+#     max_page_bytes: 5242880    larger pages are skipped
+#     respect_robots_txt: true   set to false ONLY if you own/are authorized
+#     user_agent_contact: ""     e.g. an e-mail address added to the User-Agent
+#
+#   sources:
+#     - id: my-docs              REQUIRED. Stable id: lowercase letters, digits, - or _
+#       name: My Docs            Display name (defaults to the id)
+#       start_urls: [...]        REQUIRED. Where crawling begins
+#       allowed_prefixes: [...]  URL prefixes that may be crawled  } at least
+#       allowed_hosts: [...]     whole hosts that may be crawled    } one required
+#       max_pages: 100           Maximum page requests for this source
+#       max_depth: 0             Maximum link depth from a start URL (0 = unlimited)
+#       include_patterns: [...]  Optional regular expressions; a URL must match one
+#       exclude_patterns: [...]  Optional regular expressions; matching URLs are skipped
+#       keep_query_strings: false  Treat ?a=b variants as separate pages (default: no)
+#       respect_robots_txt: true   Per-source override of the global setting
+#
+# The examples below are small, public documentation sites that are
+# suitable for trying out the portal.
+
+settings:
+  concurrency: 4
+  request_delay_ms: 250
+  request_timeout_seconds: 20
+
+sources:
+  # The official Python tutorial (about 20 pages).
+  - id: python-tutorial
+    name: Python Tutorial
+    start_urls:
+      - https://docs.python.org/3/tutorial/index.html
+    allowed_prefixes:
+      - https://docs.python.org/3/tutorial/
+    max_pages: 40
+
+  # "The Rust Programming Language" book (about 100 chapters).
+  - id: rust-book
+    name: The Rust Book
+    start_urls:
+      - https://doc.rust-lang.org/book/
+    allowed_prefixes:
+      - https://doc.rust-lang.org/book/
+    exclude_patterns:
+      - /print\.html$        # the single-page "print" version duplicates every chapter
+      - /(first|second)-edition/
+    max_pages: 120
+
+  # A few Go language documents.
+  - id: go-docs
+    name: Go Documentation
+    start_urls:
+      - https://go.dev/doc/
+    allowed_prefixes:
+      - https://go.dev/doc/
+    exclude_patterns:
+      - /doc/devel/          # release history and weekly notes
+      - /doc/go1\.\d+        # per-release notes
+    max_pages: 40
